@@ -2,9 +2,10 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { StatCard } from "@/components/StatCard";
-// import { columns } from "@/components/table/columns";
-// import { DataTable } from "@/components/table/DataTable";
+
 import { getRecentAppointmentList } from "@/lib/actions/appointment.actions";
+import {DataTable} from "@/components/table/DataTable";
+import {columns} from "@/components/table/columns";
 
 const AdminPage = async () => {
   const appointments = await getRecentAppointmentList();
@@ -14,7 +15,7 @@ const AdminPage = async () => {
       <header className="admin-header">
         <Link href="/" className="cursor-pointer">
           <Image
-            src="/assets/icons/logo-full.svg"
+            src="/assets/icons/logo.svg"
             height={32}
             width={162}
             alt="logo"
@@ -54,7 +55,7 @@ const AdminPage = async () => {
           />
         </section>
 
-        {/* <DataTable columns={columns} data={appointments.documents} /> */}
+        <DataTable columns={columns} data={appointments.documents} />
       </main>
     </div>
   );

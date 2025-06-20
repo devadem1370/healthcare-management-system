@@ -9,7 +9,8 @@ type SearchParamProps = {
 };
 
 const Register = async (props: SearchParamProps) => {
-  const { userId } = props.params;
+  const { params } = props;
+  const { userId } = await params;
 
   // Fetch the user data
   const user = await getUser(userId);

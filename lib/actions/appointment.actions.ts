@@ -1,9 +1,10 @@
 "use server"
-import { APPOINTMENT_COLLECTION_ID, DATABASE_ID, databases, ENDPOINT } from "../appwrite.config"
+import { APPOINTMENT_COLLECTION_ID, DATABASE_ID, databases, ENDPOINT, messaging } from "../appwrite.config"
 import { ID, Query } from "node-appwrite"
-import { parseStringify } from "../utils"
+import { formatDateTime, parseStringify } from "../utils"
 import { Appointment } from "@/types/appwrite.types"
 import { revalidatePath } from "next/cache"
+import { RedirectType } from "next/navigation"
 
 export const createAppointment = async(appointment: CreateAppointmentParams)=>{
 
@@ -138,6 +139,14 @@ export const updateAppointment = async ({
 
     if (!updatedAppointment) throw Error;
 
+    const smsMessage = `Hi it's CarePulse.
+    ${type === 'schedule'
+      ? `Your appointment has been scheduled for ${formatDateTime(appointment.schedule!)}` : `We regret that your appointment has been cancelled. Reason: ${appointment.cancellationReason}`
+
+    }
+    `
+
+    await sendSNSNotification(userId, smsMessage)
     
     revalidatePath("/admin");
     return parseStringify(updatedAppointment);
@@ -146,3 +155,20 @@ export const updateAppointment = async ({
   }
 };
 
+
+
+export const sendSNSNotification = async (userId: string, content: string) =>{
+  try {
+    const message = await messaging.createSms(
+      ID.unique(),
+      content,
+      [],
+      [userId]
+    )
+
+    return parseStringify(message)
+  } catch (error) {
+    console.log(error)
+    
+  }
+}
